@@ -331,8 +331,46 @@ bool install() {
     hookSignature(SignatureId::ChatScreenDtor, reinterpret_cast<void*>(chatCloseDetour), &chatCloseOriginal);
     hookSignature(SignatureId::ContainerScreenControllerOnContainerSlotSelected, reinterpret_cast<void*>(containerSlotSelectedDetour), &containerSlotSelectedOriginal);
     hookEgl();
-    installed = tickOriginal != nullptr && clientUpdateOriginal != nullptr;
-    return installed;
+
+    // The frame tick and client-instance update hooks are the minimum runtime
+    // contract. If either is missing, remove every hook installed in this
+    // attempt so a failed install cannot leave a partially active detour set.
+    if (!tickOriginal || !clientUpdateOriginal) {
+        for (std::size_t i = 0; i < handleCount; ++i) {
+            if (handles[i]) bedrocktools::hooks::remove(handles[i]);
+            handles[i] = nullptr;
+        }
+        handleCount = 0;
+
+        versionOriginal = nullptr;
+        tickOriginal = nullptr;
+        gameModeStartDestroyBlockOriginal = nullptr;
+        survivalModeStartDestroyBlockOriginal = nullptr;
+        gameModeStopDestroyBlockOriginal = nullptr;
+        gameModeStartBuildBlockOriginal = nullptr;
+        survivalModeStartBuildBlockOriginal = nullptr;
+        gameModeUseItemOriginal = nullptr;
+        survivalModeUseItemOriginal = nullptr;
+        gameModeUseItemAsAttackOriginal = nullptr;
+        survivalModeUseItemAsAttackOriginal = nullptr;
+        gameModeUseItemOnOriginal = nullptr;
+        survivalModeUseItemOnOriginal = nullptr;
+        gameModeInteractOriginal = nullptr;
+        survivalModeInteractOriginal = nullptr;
+        gameModeAttackOriginal = nullptr;
+        clientUpdateOriginal = nullptr;
+        containerSlotSelectedOriginal = nullptr;
+        containerOpenOriginal = nullptr;
+        containerCloseOriginal = nullptr;
+        chatOpenOriginal = nullptr;
+        chatCloseOriginal = nullptr;
+        swapBuffersOriginal = nullptr;
+        installed = false;
+        return false;
+    }
+
+    installed = true;
+    return true;
 }
 
 void uninstall() {
