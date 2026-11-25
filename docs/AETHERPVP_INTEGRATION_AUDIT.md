@@ -59,3 +59,42 @@ The README's License section says GPL-3.0, while the checked-in `LICENSE` file c
 - Inspect the artifact contents and build logs.
 - Produce the first compatibility matrix for ArmorHUD and PotionHUD.
 - Resolve the license discrepancy before redistribution.
+
+
+## Expanded whole-project review — 2026-11-25
+
+### Startup and configuration flow
+
+The current startup sequence in `Runtime::install()` is:
+
+1. Resolve signatures.
+2. Install core game hooks.
+3. Register all modules.
+4. Wire runtime events.
+5. Load saved configuration.
+6. Initialize modules that are enabled by the loaded configuration.
+7. Register modules with the launcher menu.
+
+This ordering means module `onInit()` work triggered by saved settings occurs after core hooks are installed. The lazy initialization change also avoids initializing every disabled module. The current `Module::initializeOnce()` sets its initialized flag before calling `onInit()`; this prevents re-entrant duplicate initialization, but there is no explicit success/failure result or retry path if an initializer cannot establish its dependencies.
+
+### Confirmed project-wide blockers
+
+- The module registry advertises 51 modules, but source presence and successful compilation do not prove each module works on the current Minecraft binary.
+- The signature resolver still reports success when at least one address resolves. There is no per-module dependency readiness result.
+- The game-hook installer attempts a broad set of hooks but only treats the tick and client-update hooks as essential. Other missing hooks are not surfaced as a structured capability report.
+- Runtime captures a Minecraft version string in the hook layer, but does not use it as an explicit compatibility gate before enabling version-sensitive code.
+- ArmorHUD and PotionHUD both rely on native ABI/layout assumptions, offsets, vtable indices and render-context behavior. Neither is safe to certify from source inspection alone.
+- Configuration loading catches all exceptions without exposing a parse/load error to the user. A malformed config can therefore silently leave defaults active.
+- README claims GPL-3.0 while the checked-in LICENSE text says MIT. This must be resolved with the upstream author before redistribution.
+
+### Whole-project release gates
+
+1. Identify the exact target Minecraft package version and hash/build identity of its ARM64 `libminecraftpe.so`.
+2. Build a dependency inventory for every module: signatures, offsets, RTTI/vtable slots, native prototypes, hooks, and runtime prerequisites.
+3. Add explicit global compatibility and per-module readiness gates; missing optional dependencies must disable only the affected capability.
+4. Test each read-only HUD in a local/offline world, then test settings persistence, module toggling, reload/unload, and clean failure behavior.
+5. Integrate the verified BedrockTools package into the AetherPvP launcher and confirm the launcher actually loads the intended package/library.
+6. Implement and test original AetherPvP features only after the shared runtime and module lifecycle are stable.
+7. Resolve licensing and produce reproducible release artifacts with a rollback build.
+
+No new gameplay feature is certified by this review. Build success remains compile/package evidence only.
