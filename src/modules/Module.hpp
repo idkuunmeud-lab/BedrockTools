@@ -17,6 +17,11 @@ public:
     bool hideInHudEditor = false;
     int keybind = 0;
 
+private:
+    bool mInitialized = false;
+
+public:
+
     Module(const char* n, const char* d) : name(n), description(d), moduleId(std::string("bedrocktools.") + n) {}
     virtual ~Module() = default;
 
@@ -28,6 +33,12 @@ public:
     virtual bool onMenuConfigChanged(std::string_view key, std::string_view value) { return false; }
     virtual bool showInLegacyMenu(std::string_view key) const { return true; }
     virtual void onMenuRegistered() {}
+
+    void initializeOnce() {
+        if (mInitialized) return;
+        mInitialized = true;
+        onInit();
+    }
     
     virtual void onKeybindEvent(const std::string& key, bool isDown) {
         if (key == "keybind" && isDown) {
@@ -51,8 +62,12 @@ public:
         bool newState = masterEnabled && keybindActive;
         if (newState != enabled) {
             enabled = newState;
-            if (enabled) onEnable();
-            else onDisable();
+            if (enabled) {
+                initializeOnce();
+                onEnable();
+            } else {
+                onDisable();
+            }
         }
     }
 
