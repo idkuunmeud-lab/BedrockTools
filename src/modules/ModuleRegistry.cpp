@@ -67,7 +67,7 @@ const std::vector<Module*>& ModuleRegistry::modules() const {
 
 void ModuleRegistry::initialize() {
     if (mInitialized) return;
-    for (auto* module : mView) module->onInit();
+    // Initialize only modules enabled by the saved configuration. Disabled modules\n    // must not install game hooks or touch version-sensitive game state at startup.\n    for (auto* module : mView) {\n        if (module->enabled) module->initializeOnce();\n    }
     mInitialized = true;
 }
 
