@@ -112,8 +112,8 @@ bool Runtime::install() {
     if (!gamehooks::install()) return false;
     registerAllModules();
     wireEvents();
+    // Load saved module states before initialization so disabled modules stay dormant.\n    bedrocktools::config::ConfigManager::get().load();
     ModuleRegistry::get().initialize();
-    bedrocktools::config::ConfigManager::get().load();
     registerModulesWithLauncher();
     installed.store(true, std::memory_order_release);
     return true;
