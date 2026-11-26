@@ -1,4 +1,5 @@
 #include "ModuleRegistry.hpp"
+#include "aethergold.hpp"
 #include "visual/fullbright.hpp"
 #include "visual/performanceprofile.hpp"
 #include "visual/motionblur.hpp"
@@ -96,6 +97,7 @@ bool ModuleRegistry::keybindBlocked() const {
 void registerAllModules() {
     auto& registry = ModuleRegistry::get();
     if (!registry.modules().empty()) return;
+    registry.emplace<AetherGoldModule>();
     registry.emplace<FullbrightModule>();
     registry.emplace<PerformanceProfileModule>();
     registry.emplace<MotionBlurModule>();
