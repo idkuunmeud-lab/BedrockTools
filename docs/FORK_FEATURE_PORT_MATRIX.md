@@ -47,7 +47,7 @@ The hub links existing BedrockTools modules; it does not duplicate implementatio
 | Freelook | bedrocktools.Freelook | Camera |
 | Chunk Border | bedrocktools.Chunk Border | Visual |
 | Low Graphics Profile | bedrocktools.Low Graphics Profile | Performance |
-| Projectile Trajectory Preview | bedrocktools.Projectile Trajectory Preview | PvP HUD (planned; disabled until shared world-render integration is implemented) |
+| Projectile Trajectory Preview | bedrocktools.Projectile Trajectory Preview | PvP HUD |
 
 ## Compatibility notes
 - Zoom uses BedrockTools' own resolved FOV/turn-delta signatures. Xelo's implementation is not copied.
@@ -68,9 +68,9 @@ The hub links existing BedrockTools modules; it does not duplicate implementatio
 No external implementation code is copied in this batch. The forks remain separate repositories. Any future source reuse must record the exact upstream file, license, required notices/source-offer obligations, and compatibility impact before code is brought across.
 
 
-## Projectile trajectory preview status
+## Projectile trajectory preview
 
-The Gold Aether PvP menu now reserves a dedicated, disabled entry for Projectile Trajectory Preview. It is intentionally unavailable until a shared world-render hook is implemented. Chunk Border currently hooks RenderLevel; installing another independent hook at the same target risks hook chaining conflicts and instability. The preview must use one coordinated render path, verified projectile launch parameters and collision handling before it can be enabled. The placeholder does not install hooks, read projectile state, or affect frame performance.
+Implemented as an opt-in world-space line preview for held ender pearls, snowballs, eggs and tridents. It reads the held item description through Player::getCarriedItem, derives launch direction from player rotation, simulates a bounded flight path, and renders line segments through the RenderLevel tessellator path. Physics values are estimates and this first version does not raycast blocks or entities, so it does not claim a collision/landing marker. Validate on the exact Bedrock build before treating runtime offsets and launch constants as confirmed.
 
 
 ## Breadcrumbs removal
