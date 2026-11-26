@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <charconv>
 #include <string>
+#include <utility>
 #include <vector>
 #include <pl/ModMenu.hpp>
 
@@ -65,6 +66,7 @@ void HitTimingModule::onFrame() {
     int cooldown = 500;
     int combo = 0;
     bool hasAttack = false;
+    bool showStreak = true;
     float progress = 1.0f;
     std::string status = "READY";
     {
@@ -72,6 +74,7 @@ void HitTimingModule::onFrame() {
         cooldown = m_cooldownMs;
         combo = m_combo;
         hasAttack = m_hasAttack;
+        showStreak = m_showStreak;
         if (hasAttack) {
             const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - m_lastAcceptedAttack).count();
@@ -123,7 +126,7 @@ void HitTimingModule::onFrame() {
     bar.color = status == "READY" ? 0xFF49D17D : 0xFFE0A43A;
     commands.push_back(bar);
 
-    const std::string label = m_showStreak && combo > 0
+    const std::string label = showStreak && combo > 0
         ? status + "   STREAK " + std::to_string(combo)
         : status;
     PLModMenu_DrawCommand text{};
@@ -141,16 +144,18 @@ void HitTimingModule::onFrame() {
 }
 
 bool HitTimingModule::onMenuConfigChanged(std::string_view key, std::string_view value) {
-    std::lock_guard lock(m_mutex);
-    if (key == "cooldownMs") {
-        int parsed = m_cooldownMs;
-        const auto result = std::from_chars(value.data(), value.data() + value.size(), parsed);
-        if (result.ec != std::errc{} || result.ptr != value.data() + value.size()) return false;
-        m_cooldownMs = std::clamp(parsed, 100, 2000);
-    } else if (key == "showStreak") {
-        m_showStreak = value == "true" || value == "1";
-    } else {
-        return false;
+    {
+        std::lock_guard lock(m_mutex);
+        if (key == "cooldownMs") {
+            int parsed = m_cooldownMs;
+            const auto result = std::from_chars(value.data(), value.data() + value.size(), parsed);
+            if (result.ec != std::errc{} || result.ptr != value.data() + value.size()) return false;
+            m_cooldownMs = std::clamp(parsed, 100, 2000);
+        } else if (key == "showStreak") {
+            m_showStreak = value == "true" || value == "1";
+        } else {
+            return false;
+        }
     }
     bedrocktools::config::ConfigManager::get().save();
     return true;
@@ -184,7 +189,7 @@ void HitTimingModule::onMenuRegistered() {
     cooldown.title = "Estimated Cooldown";
     cooldown.description = "Server and weapon rules can differ; this only times your local attack events.";
     cooldown.category = "timing";
-    cooldown.type = ConfigControlTypeV2::SliderInt;
+    cooldown.type = ConfigControlTypeV2::SliderFloat;
     cooldown.minValue = "100";
     cooldown.maxValue = "2000";
     cooldown.step = "25";
