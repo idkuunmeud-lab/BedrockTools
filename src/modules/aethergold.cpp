@@ -15,7 +15,7 @@ struct AetherFeature {
     std::string_view category;
 };
 
-constexpr std::array<AetherFeature, 11> kFeatures{{
+constexpr std::array<AetherFeature, 18> kFeatures{{
     {"fps_display", "FPS Display", "FPS callback-rate estimate and frame-time graph.", "bedrocktools.FPS Display", "pvp_hud"},
     {"ping_counter", "Ping Counter", "Show the server ping.", "bedrocktools.Ping Counter", "pvp_hud"},
     {"inventory_supply", "Inventory Supply", "Track pearls, golden apples, obsidian and end crystals.", "bedrocktools.Inventory Supply", "pvp_hud"},
@@ -24,6 +24,12 @@ constexpr std::array<AetherFeature, 11> kFeatures{{
     {"totem_counter", "Totem Counter", "Count totems in inventory and offhand.", "bedrocktools.Totem Counter", "pvp_hud"},
     {"keystrokes", "Keystrokes", "Show key presses and mouse CPS.", "bedrocktools.Keystrokes", "pvp_hud"},
     {"third_person_nametag", "Third Person Nametag", "Show your own nametag while using third-person view.", "bedrocktools.Third Person Nametag", "pvp_hud"},
+    {"arrow_counter", "Arrow Counter", "Count arrows in inventory and offhand.", "bedrocktools.Arrow Counter", "pvp_hud"},
+    {"reach_counter", "Reach Counter", "Display measured attack reach after a hit.", "bedrocktools.Reach Counter", "pvp_hud"},
+    {"combo_display", "Combo Display", "Track consecutive successful hits.", "bedrocktools.Combo Display", "pvp_hud"},
+    {"break_indicator", "Break Indicator", "Show block-breaking progress.", "bedrocktools.Break Indicator", "pvp_hud"},
+    {"tablist", "Tablist", "Display the loaded player list.", "bedrocktools.Tablist", "pvp_hud"},
+    {"compass", "Compass", "Show facing direction in a compact HUD.", "bedrocktools.Compass", "utility"},
     {"player_coords", "Player Coords", "Show your XYZ coordinates.", "bedrocktools.Player Coords", "utility"},
     {"speed_display", "Speed Display", "Show movement speed.", "bedrocktools.Speed Display", "utility"},
     {"session_timer", "Session Timer", "Show elapsed time since this timer was enabled.", "bedrocktools.Session Timer", "utility"},
