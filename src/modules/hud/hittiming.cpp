@@ -1,4 +1,5 @@
 #include "hittiming.hpp"
+#include "modules/ModuleRegistry.hpp"
 
 #include "config/ConfigManager.hpp"
 #include <bedrocktools/events/AttackEvent.hpp>
