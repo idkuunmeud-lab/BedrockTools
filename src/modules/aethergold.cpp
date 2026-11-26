@@ -6,7 +6,7 @@
 #include <string_view>
 namespace {
 struct AetherFeature { std::string_view key,title,description,moduleId,category; };
-constexpr std::array<AetherFeature,27> kFeatures{{
+constexpr std::array<AetherFeature,28> kFeatures{{
 {"fps_display","FPS Display","FPS callback-rate estimate and frame-time graph.","bedrocktools.FPS Display","pvp_hud"},
 {"ping_counter","Ping Counter","Show the server ping.","bedrocktools.Ping Counter","pvp_hud"},
 {"inventory_supply","Inventory Supply","Track pearls, golden apples, obsidian and end crystals.","bedrocktools.Inventory Supply","pvp_hud"},
@@ -17,6 +17,7 @@ constexpr std::array<AetherFeature,27> kFeatures{{
 {"third_person_nametag","Third Person Nametag","Show your own nametag while using third-person view.","bedrocktools.Third Person Nametag","pvp_hud"},
 {"arrow_counter","Arrow Counter","Count arrows in inventory and offhand.","bedrocktools.Arrow Counter","pvp_hud"},
 {"reach_counter","Reach Counter","Display measured attack reach after a hit.","bedrocktools.Reach Counter","pvp_hud"},
+{"hit_timing","Hit Timing","Estimate the next attack window from your local swing timing; server confirmation is not available.","bedrocktools.Hit Timing","pvp_hud"},
 {"combo_display","Combo Display","Track consecutive successful hits.","bedrocktools.Combo Display","pvp_hud"},
 {"break_indicator","Break Indicator","Show block-breaking progress.","bedrocktools.Break Indicator","pvp_hud"},
 {"tablist","Tablist","Display the loaded player list.","bedrocktools.Tablist","pvp_hud"},
