@@ -70,7 +70,7 @@ No external implementation code is copied in this batch. The forks remain separa
 
 ## Projectile trajectory preview
 
-Implemented as an opt-in world-space line preview for held ender pearls, snowballs, eggs and tridents. It reads the held item description through Player::getCarriedItem, derives launch direction from player rotation, simulates a bounded flight path, and renders line segments through the RenderLevel tessellator path. Physics values are estimates and this first version does not raycast blocks or entities, so it does not claim a collision/landing marker. Validate on the exact Bedrock build before treating runtime offsets and launch constants as confirmed.
+Implemented as an opt-in world-space line preview for held ender pearls, snowballs, eggs, tridents and fully drawn bows. It reads the held item description through Player::getCarriedItem, derives launch direction from player rotation, simulates a bounded flight path, and renders line segments through the RenderLevel tessellator path. Bow support assumes a fully drawn shot because the current SDK does not expose bow charge progress; partial-draw shots are approximate. Physics values are estimates and this first version does not raycast blocks or entities, so it does not claim a collision/landing marker. Validate on the exact Bedrock build before treating runtime offsets and launch constants as confirmed.
 
 
 ## Breadcrumbs removal
