@@ -25,6 +25,7 @@ private:
     void* m_tessColor = nullptr;
     void* m_tessVertex = nullptr;
     void* m_renderMesh = nullptr;
+    void* m_isSolidBlockingBlock = nullptr;
     void* m_hookHandle = nullptr;
     bool m_hookInstalled = false;
     std::uint64_t m_subscription = 0;
