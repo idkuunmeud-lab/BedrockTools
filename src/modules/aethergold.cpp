@@ -6,7 +6,7 @@
 #include <string_view>
 namespace {
 struct AetherFeature { std::string_view key,title,description,moduleId,category; };
-constexpr std::array<AetherFeature,25> kFeatures{{
+constexpr std::array<AetherFeature,24> kFeatures{{
 {"fps_display","FPS Display","FPS callback-rate estimate and frame-time graph.","bedrocktools.FPS Display","pvp_hud"},
 {"ping_counter","Ping Counter","Show the server ping.","bedrocktools.Ping Counter","pvp_hud"},
 {"inventory_supply","Inventory Supply","Track pearls, golden apples, obsidian and end crystals.","bedrocktools.Inventory Supply","pvp_hud"},
@@ -28,7 +28,6 @@ constexpr std::array<AetherFeature,25> kFeatures{{
 {"chat_timestamps","Chat Timestamps","Add local timestamps to supported chat and system messages.","bedrocktools.Chat Timestamps","utility"},
 {"zoom","Zoom","Smooth camera zoom with configurable FOV.","bedrocktools.Zoom","camera"},
 {"freelook","Freelook","Look around without changing your player's facing or movement direction.","bedrocktools.Freelook","camera"},
-{"breadcrumbs","Breadcrumbs","Draw a visual trail along your recent movement path.","bedrocktools.Breadcrumbs","visual"},
 {"chunk_border","Chunk Border","Draw chunk boundaries for world orientation.","bedrocktools.Chunk Border","visual"},
 {"low_graphics","Low Graphics Profile","Temporarily disable selected visual effects to reduce rendering load.","bedrocktools.Low Graphics Profile","performance"},
 {"projectile_trajectory","Projectile Trajectory Preview","Experimental trajectory preview for supported throwable projectiles. Awaiting shared world-render integration; unavailable in this build.","bedrocktools.Projectile Trajectory Preview","pvp_hud"}
