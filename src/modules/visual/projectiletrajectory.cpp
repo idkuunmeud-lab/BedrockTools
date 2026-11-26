@@ -6,7 +6,6 @@
 #include <bedrocktools/events/EventBus.hpp>
 #include <bedrocktools/events/LocalPlayerTickEvent.hpp>
 #include <bedrocktools/memory/Signatures.hpp>
-#include <bedrocktools/sdk/ClientInstance.hpp>
 #include <bedrocktools/sdk/Offsets.hpp>
 #include <bedrocktools/sdk/world/Actor.hpp>
 #include <algorithm>
