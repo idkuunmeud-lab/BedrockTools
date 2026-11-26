@@ -47,7 +47,6 @@
 #include "visual/zoom.hpp"
 #include "visual/freelook.hpp"
 #include "visual/cinematiccamera.hpp"
-#include "visual/breadcrumbs.hpp"
 #include "visual/lightoverlay.hpp"
 #include "visual/shulkerpreview.hpp"
 #include "visual/connectedglass.hpp"
@@ -144,7 +143,6 @@ void registerAllModules() {
     registry.emplace<ZoomModule>();
     registry.emplace<FreelookModule>();
     registry.emplace<CinematicCameraModule>();
-    registry.emplace<BreadcrumbsModule>();
     registry.emplace<SkinStealerModule>();
     registry.emplace<AutoGG>();
     registry.emplace<HiveUtilsModule>();
