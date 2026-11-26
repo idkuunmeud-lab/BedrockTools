@@ -42,7 +42,7 @@ void FPSUnlockerModule::onMenuRegistered() {
     target.id = "targetFPS";
     target.key = "targetFPS";
     target.title = "FPS Limit";
-    target.description = "0 disables the limiter. A lower cap can reduce heat and power use; it does not increase the device's maximum FPS.";
+    target.description = "Temporarily unavailable: this control is retained for configuration compatibility, but no FPS cap is applied while safe display-synchronized pacing is being developed.";
     target.category = "pacing";
     target.type = ConfigControlTypeV2::SliderInt;
     target.minValue = "0";
