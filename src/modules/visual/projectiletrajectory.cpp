@@ -61,22 +61,22 @@ bool heldItemIdentifier(const sdk::Player* player, std::string& result) {
 
     using GetCarriedItem = const void*(*)(const void*);
     const void* stack = reinterpret_cast<GetCarriedItem>(
-        table[sdk::offsets::VTable::PlayerGetCarriedItem])(player);
+        table[bedrocktools::sdk::offsets::VTable::PlayerGetCarriedItem])(player);
     if (!stack || reinterpret_cast<std::uintptr_t>(stack) < 0x10000) return false;
 
     const auto* counter = *reinterpret_cast<const void* const*>(
-        reinterpret_cast<std::uintptr_t>(stack) + sdk::offsets::Inventory::ItemStackItemCounter);
+        reinterpret_cast<std::uintptr_t>(stack) + bedrocktools::sdk::offsets::Inventory::ItemStackItemCounter);
     if (!counter || reinterpret_cast<std::uintptr_t>(counter) < 0x10000) return false;
 
     const auto* item = *reinterpret_cast<const void* const*>(counter);
     if (!item || reinterpret_cast<std::uintptr_t>(item) < 0x10000) return false;
 
     auto itemTable = *reinterpret_cast<void* const* const*>(item);
-    if (!itemTable || !itemTable[sdk::offsets::Inventory::ItemGetDescriptionIdVtableIndex]) return false;
+    if (!itemTable || !itemTable[bedrocktools::sdk::offsets::Inventory::ItemGetDescriptionIdVtableIndex]) return false;
 
     using GetDescriptionId = const std::string&(*)(const void*);
     const auto& id = reinterpret_cast<GetDescriptionId>(
-        itemTable[sdk::offsets::Inventory::ItemGetDescriptionIdVtableIndex])(item);
+        itemTable[bedrocktools::sdk::offsets::Inventory::ItemGetDescriptionIdVtableIndex])(item);
     if (id.empty() || id.size() > 128) return false;
 
     result = id;
@@ -217,21 +217,21 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
 
     const auto rendererAddress = reinterpret_cast<std::uintptr_t>(renderer);
     const auto* lrp = *reinterpret_cast<void* const*>(
-        rendererAddress + sdk::offsets::LevelRenderer::mLevelRendererPlayer);
+        rendererAddress + bedrocktools::sdk::offsets::LevelRenderer::mLevelRendererPlayer);
     if (!lrp || reinterpret_cast<std::uintptr_t>(lrp) < 0x10000) return;
 
     const auto lrpAddress = reinterpret_cast<std::uintptr_t>(lrp);
     const auto camera = *reinterpret_cast<const bedrocktools::sdk::Vec3*>(
-        lrpAddress + sdk::offsets::LevelRendererPlayer::mCamPos);
+        lrpAddress + bedrocktools::sdk::offsets::LevelRendererPlayer::mCamPos);
     if (!std::isfinite(camera.x) || !std::isfinite(camera.y) || !std::isfinite(camera.z)) return;
 
     const auto contextAddress = reinterpret_cast<std::uintptr_t>(screenContext);
     void* tess = *reinterpret_cast<void**>(
-        contextAddress + sdk::offsets::ScreenContext::mTessellator);
+        contextAddress + bedrocktools::sdk::offsets::ScreenContext::mTessellator);
     if (!tess || reinterpret_cast<std::uintptr_t>(tess) < 0x10000) return;
 
     void* material = reinterpret_cast<void*>(
-        lrpAddress + sdk::offsets::LevelRendererPlayer::mSelectionOverlayMaterial);
+        lrpAddress + bedrocktools::sdk::offsets::LevelRendererPlayer::mSelectionOverlayMaterial);
     bedrocktools::core::ScopedShaderColor shaderColor(screenContext);
     if (!shaderColor) return;
 
