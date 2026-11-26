@@ -72,7 +72,7 @@ void FpsDisplayModule::onFrame() {
         if (m_currentFps > 0) {
             m_displayText = "FPS: " + std::to_string(m_currentFps);
             if (m_showFrameTime && m_frameTimeMs > 0.0f) {
-                m_displayText += " | " + std::to_string(static_cast<int>(std::lround(m_frameTimeMs * 10.0f) / 10.0f));
+                m_displayText += " | " + std::to_string(static_cast<int>(std::lround(m_frameTimeMs)));
                 m_displayText += " ms";
             }
         } else {
