@@ -15,7 +15,7 @@ struct AetherFeature {
     std::string_view category;
 };
 
-constexpr std::array<AetherFeature, 18> kFeatures{{
+constexpr std::array<AetherFeature, 20> kFeatures{{
     {"fps_display", "FPS Display", "FPS callback-rate estimate and frame-time graph.", "bedrocktools.FPS Display", "pvp_hud"},
     {"ping_counter", "Ping Counter", "Show the server ping.", "bedrocktools.Ping Counter", "pvp_hud"},
     {"inventory_supply", "Inventory Supply", "Track pearls, golden apples, obsidian and end crystals.", "bedrocktools.Inventory Supply", "pvp_hud"},
@@ -33,6 +33,8 @@ constexpr std::array<AetherFeature, 18> kFeatures{{
     {"player_coords", "Player Coords", "Show your XYZ coordinates.", "bedrocktools.Player Coords", "utility"},
     {"speed_display", "Speed Display", "Show movement speed.", "bedrocktools.Speed Display", "utility"},
     {"session_timer", "Session Timer", "Show elapsed time since this timer was enabled.", "bedrocktools.Session Timer", "utility"},
+    {"world_time", "World Time", "Display the in-world clock in 12-hour or 24-hour format.", "bedrocktools.World Time", "utility"},
+    {"chat_timestamps", "Chat Timestamps", "Add local timestamps to supported chat and system messages.", "bedrocktools.Chat Timestamps", "utility"},
     {"low_graphics", "Low Graphics Profile", "Temporarily disable selected visual effects to reduce rendering load.", "bedrocktools.Low Graphics Profile", "performance"}
 }};
 
@@ -54,7 +56,7 @@ void AetherGoldModule::onMenuRegistered() {
     ConfigSchemaBuilder schema;
     schema.defaultCategory("pvp_hud")
         .category("pvp_hud", "PvP HUD", "Combat-relevant information overlays")
-        .category("utility", "Utility", "Movement and session information")
+        .category("utility", "Utility", "Movement, chat and world information")
         .category("performance", "Performance", "Graphics and frame pacing options");
 
     auto& registry = ModuleRegistry::get();
