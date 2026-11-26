@@ -7,13 +7,13 @@
 #include <bedrocktools/memory/Signatures.hpp>
 #include <bedrocktools/sdk/Offsets.hpp>
 #include <bedrocktools/sdk/world/Actor.hpp>
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
 #include <string>
 
 namespace {
-using namespace bedrocktools;
 using TessBegin = void(*)(void*, void*, int, int, int);
 using TessColor = void(*)(void*, float, float, float, float);
 using TessVertex = void(*)(void*, float, float, float);
@@ -22,6 +22,7 @@ using IsSolidBlockingBlock = bool(*)(void*, const bedrocktools::sdk::BlockPos&);
 
 constexpr float kDegreesToRadians = 0.01745329251994329577f;
 constexpr int kMaxFlightTicks = 100;
+constexpr float kCollisionSampleSpacing = 0.25f;
 static ProjectileTrajectoryPreviewModule* g_trajectory = nullptr;
 static void (*g_renderLevelOriginal)(void*, void*, void*) = nullptr;
 
@@ -44,8 +45,7 @@ bool physicsFor(const std::string& id, ProjectilePhysics& out) {
         out = {2.50f, 0.05f, 0.99f};
         return true;
     }
-    // The SDK currently exposes the held item, but not the active bow-use charge.
-    // Use the full-charge launch estimate and make the limitation explicit in the UI.
+    // The current SDK does not expose active bow-use charge; this is the full-charge estimate.
     if (id.find("bow") != std::string::npos && id.find("crossbow") == std::string::npos) {
         out = {3.00f, 0.05f, 0.99f};
         return true;
@@ -53,10 +53,10 @@ bool physicsFor(const std::string& id, ProjectilePhysics& out) {
     return false;
 }
 
-bool heldItemIdentifier(const sdk::Player* player, std::string& result) {
+bool heldItemIdentifier(const bedrocktools::sdk::Player* player, std::string& result) {
     if (!player) return false;
 
-    auto table = *reinterpret_cast<void***>(const_cast<sdk::Player*>(player));
+    auto table = *reinterpret_cast<void***>(const_cast<bedrocktools::sdk::Player*>(player));
     if (!table || !table[bedrocktools::sdk::offsets::VTable::PlayerGetCarriedItem]) return false;
 
     using GetCarriedItem = const void*(*)(const void*);
@@ -81,6 +81,10 @@ bool heldItemIdentifier(const sdk::Player* player, std::string& result) {
 
     result = id;
     return true;
+}
+
+bool finite(const bedrocktools::sdk::Vec3& value) {
+    return std::isfinite(value.x) && std::isfinite(value.y) && std::isfinite(value.z);
 }
 }
 
@@ -136,31 +140,42 @@ void ProjectileTrajectoryPreviewModule::onEnable() {
 }
 
 void ProjectileTrajectoryPreviewModule::onDisable() {
-    m_player.store(nullptr, std::memory_order_release);
+    std::lock_guard lock(m_pathMutex);
+    m_pointCount = 0;
+    m_hitSolidBlock = false;
 }
 
 void ProjectileTrajectoryPreviewModule::updatePlayer(bedrocktools::sdk::Player* player) {
-    m_player.store(enabled ? player : nullptr, std::memory_order_release);
-}
+    std::array<bedrocktools::sdk::Vec3, kMaxFlightTicks + 1> nextPoints{};
+    int nextCount = 0;
+    bool nextHitSolidBlock = false;
 
-void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenContext) {
-    if (!enabled || !renderer || !screenContext ||
-        reinterpret_cast<std::uintptr_t>(renderer) < 0x10000 ||
-        reinterpret_cast<std::uintptr_t>(screenContext) < 0x10000 ||
-        !m_tessBegin || !m_tessColor || !m_tessVertex || !m_renderMesh) return;
-
-    auto* player = m_player.load(std::memory_order_acquire);
-    if (!player) return;
+    if (!enabled || !player) {
+        std::lock_guard lock(m_pathMutex);
+        m_points = nextPoints;
+        m_pointCount = 0;
+        m_hitSolidBlock = false;
+        return;
+    }
 
     std::string itemId;
     ProjectilePhysics physics{};
-    if (!heldItemIdentifier(player, itemId) || !physicsFor(itemId, physics)) return;
+    if (!heldItemIdentifier(player, itemId) || !physicsFor(itemId, physics)) {
+        std::lock_guard lock(m_pathMutex);
+        m_points = nextPoints;
+        m_pointCount = 0;
+        m_hitSolidBlock = false;
+        return;
+    }
 
     const auto rotation = player->rotation();
     const auto position = player->position();
-    if (!std::isfinite(rotation.x) || !std::isfinite(rotation.y) ||
-        !std::isfinite(position.x) || !std::isfinite(position.y) ||
-        !std::isfinite(position.z)) return;
+    if (!std::isfinite(rotation.x) || !std::isfinite(rotation.y) || !finite(position)) {
+        std::lock_guard lock(m_pathMutex);
+        m_pointCount = 0;
+        m_hitSolidBlock = false;
+        return;
+    }
 
     const float pitch = rotation.x * kDegreesToRadians;
     const float yaw = rotation.y * kDegreesToRadians;
@@ -169,16 +184,15 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     const float dy = -std::sin(pitch);
     const float dz = std::cos(yaw) * cosPitch;
 
-    std::array<bedrocktools::sdk::Vec3, kMaxFlightTicks + 1> points{};
     bedrocktools::sdk::Vec3 point{
         position.x + dx * 0.25f,
         position.y + 1.52f + dy * 0.25f,
         position.z + dz * 0.25f
     };
     bedrocktools::sdk::Vec3 velocity{dx * physics.speed, dy * physics.speed, dz * physics.speed};
-    points[0] = point;
-    int count = 1;
-    bool hitSolidBlock = false;
+    nextPoints[0] = point;
+    nextCount = 1;
+
     void* blockSource = nullptr;
     if (auto* dimension = player->dimension()) {
         blockSource = bedrocktools::sdk::field<void*>(
@@ -188,6 +202,7 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     auto isSolidBlockingBlock = reinterpret_cast<IsSolidBlockingBlock>(m_isSolidBlockingBlock);
 
     for (int tick = 0; tick < kMaxFlightTicks; ++tick) {
+        const auto previous = point;
         point.x += velocity.x;
         point.y += velocity.y;
         point.z += velocity.z;
@@ -196,22 +211,59 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
         velocity.y = velocity.y * physics.drag - physics.gravity;
         velocity.z *= physics.drag;
 
-        if (!std::isfinite(point.x) || !std::isfinite(point.y) ||
-            !std::isfinite(point.z)) break;
+        if (!finite(point)) break;
 
-        points[count++] = point;
         if (blockSource && isSolidBlockingBlock) {
-            const bedrocktools::sdk::BlockPos blockPos{
-                static_cast<int>(std::floor(point.x)),
-                static_cast<int>(std::floor(point.y)),
-                static_cast<int>(std::floor(point.z))
-            };
-            if (isSolidBlockingBlock(blockSource, blockPos)) {
-                hitSolidBlock = true;
-                break;
+            const float deltaX = point.x - previous.x;
+            const float deltaY = point.y - previous.y;
+            const float deltaZ = point.z - previous.z;
+            const float distance = std::sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+            const int steps = std::clamp(
+                static_cast<int>(std::ceil(distance / kCollisionSampleSpacing)), 1, 16);
+            for (int step = 1; step <= steps; ++step) {
+                const float fraction = static_cast<float>(step) / static_cast<float>(steps);
+                const bedrocktools::sdk::Vec3 sample{
+                    previous.x + deltaX * fraction,
+                    previous.y + deltaY * fraction,
+                    previous.z + deltaZ * fraction
+                };
+                const bedrocktools::sdk::BlockPos blockPos{
+                    static_cast<int>(std::floor(sample.x)),
+                    static_cast<int>(std::floor(sample.y)),
+                    static_cast<int>(std::floor(sample.z))
+                };
+                if (isSolidBlockingBlock(blockSource, blockPos)) {
+                    point = sample;
+                    nextHitSolidBlock = true;
+                    break;
+                }
             }
         }
-        if (point.y < -64.0f || point.y > 512.0f) break;
+
+        nextPoints[static_cast<std::size_t>(nextCount++)] = point;
+        if (nextHitSolidBlock || point.y < -64.0f || point.y > 512.0f) break;
+    }
+
+    std::lock_guard lock(m_pathMutex);
+    m_points = nextPoints;
+    m_pointCount = nextCount;
+    m_hitSolidBlock = nextHitSolidBlock;
+}
+
+void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenContext) {
+    if (!enabled || !renderer || !screenContext ||
+        reinterpret_cast<std::uintptr_t>(renderer) < 0x10000 ||
+        reinterpret_cast<std::uintptr_t>(screenContext) < 0x10000 ||
+        !m_tessBegin || !m_tessColor || !m_tessVertex || !m_renderMesh) return;
+
+    std::array<bedrocktools::sdk::Vec3, kMaxFlightTicks + 1> points{};
+    int count = 0;
+    bool hitSolidBlock = false;
+    {
+        std::lock_guard lock(m_pathMutex);
+        points = m_points;
+        count = m_pointCount;
+        hitSolidBlock = m_hitSolidBlock;
     }
     if (count < 2) return;
 
@@ -223,7 +275,7 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     const auto lrpAddress = reinterpret_cast<std::uintptr_t>(lrp);
     const auto camera = *reinterpret_cast<const bedrocktools::sdk::Vec3*>(
         lrpAddress + bedrocktools::sdk::offsets::LevelRendererPlayer::mCamPos);
-    if (!std::isfinite(camera.x) || !std::isfinite(camera.y) || !std::isfinite(camera.z)) return;
+    if (!finite(camera)) return;
 
     const auto contextAddress = reinterpret_cast<std::uintptr_t>(screenContext);
     void* tess = *reinterpret_cast<void**>(
