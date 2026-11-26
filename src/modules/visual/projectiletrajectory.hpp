@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../Module.hpp"
-#include <atomic>
+#include <bedrocktools/sdk/Types.hpp>
+#include <array>
 #include <cstdint>
+#include <mutex>
 
 namespace bedrocktools::sdk { class Player; }
 
@@ -19,7 +21,10 @@ private:
     void render(void* renderer, void* screenContext);
     friend void projectileTrajectoryRenderHook(void*, void*, void*);
 
-    std::atomic<bedrocktools::sdk::Player*> m_player{nullptr};
+    std::array<bedrocktools::sdk::Vec3, 101> m_points{};
+    int m_pointCount = 0;
+    bool m_hitSolidBlock = false;
+    std::mutex m_pathMutex;
     void* m_renderTarget = nullptr;
     void* m_tessBegin = nullptr;
     void* m_tessColor = nullptr;
