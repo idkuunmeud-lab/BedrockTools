@@ -42,6 +42,7 @@
 #include "visual/thirdpersonnametag.hpp"
 #include "hud/tablist.hpp"
 #include "hud/combocounter.hpp"
+#include "hud/hittiming.hpp"
 #include "visual/chunkborder.hpp"
 #include "visual/projectiletrajectory.hpp"
 #include "visual/hitbox.hpp"
@@ -111,6 +112,7 @@ void registerAllModules() {
     registry.emplace<SessionTimerModule>();
     registry.emplace<ReachCounterModule>();
     registry.emplace<ComboDisplay>();
+    registry.emplace<HitTimingModule>();
     registry.emplace<BreakIndicatorModule>();
     registry.emplace<PlayerCoordsModule>();
     registry.emplace<CompassModule>();
