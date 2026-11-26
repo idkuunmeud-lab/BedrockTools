@@ -23,6 +23,7 @@ constexpr std::array<AetherFeature, 11> kFeatures{{
     {"potion_hud", "PotionHUD", "Show active effects and timers.", "bedrocktools.PotionHUD", "pvp_hud"},
     {"totem_counter", "Totem Counter", "Count totems in inventory and offhand.", "bedrocktools.Totem Counter", "pvp_hud"},
     {"keystrokes", "Keystrokes", "Show key presses and mouse CPS.", "bedrocktools.Keystrokes", "pvp_hud"},
+    {"third_person_nametag", "Third Person Nametag", "Show your own nametag while using third-person view.", "bedrocktools.Third Person Nametag", "pvp_hud"},
     {"player_coords", "Player Coords", "Show your XYZ coordinates.", "bedrocktools.Player Coords", "utility"},
     {"speed_display", "Speed Display", "Show movement speed.", "bedrocktools.Speed Display", "utility"},
     {"session_timer", "Session Timer", "Show elapsed time since this timer was enabled.", "bedrocktools.Session Timer", "utility"},
