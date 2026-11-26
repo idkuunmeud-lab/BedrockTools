@@ -94,3 +94,13 @@ The current module lifecycle uses lazy one-time initialization when a module is 
 - A successful Android CI build proves compilation/packaging only; it does not prove the module works in-game.
 - Test each module independently and fail closed when required game data or hooks are unavailable.
 - Do not import platform-specific code just because the upstream repository advertises Android support.
+
+
+## Focused PvP module compatibility check — 2026-11-26
+
+A closer read of CaramelClient's PvP implementation distinguishes two different data paths:
+
+- **Select Hit / Hit Timing:** uses only the player's own attack-input timestamps and a configurable timing model. This concept is portable to BedrockTools' native AttackEvent and HUD draw-command interfaces. BedrockTools now has an independent C++ Hit Timing module; it reports a local estimate, not server-confirmed hit registration.
+- **Hit Prediction / Target HUD:** depends on CaramelClient's PeerPositions feed from its proximity-voice peer subsystem, with per-peer velocity smoothing. BedrockTools does not currently expose an equivalent native nearby-player position feed through its module API. Copying the overlay alone would show nothing or require inventing positions, so this is **not ported** until a safe, version-matched actor feed is available.
+
+The source review supports adapting the local timing concept, but not transplanting CaramelClient's Android WindowManager overlays or its peer-feed implementation into the BedrockTools/LeviLauncher native renderer.
