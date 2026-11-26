@@ -189,7 +189,8 @@ void HitTimingModule::onMenuRegistered() {
     cooldown.title = "Estimated Cooldown";
     cooldown.description = "Server and weapon rules can differ; this only times your local attack events.";
     cooldown.category = "timing";
-    cooldown.type = ConfigControlTypeV2::SliderFloat;
+    cooldown.type = ConfigControlTypeV2::SliderInt;
+    cooldown.defaultValue = "500";
     cooldown.minValue = "100";
     cooldown.maxValue = "2000";
     cooldown.step = "25";
