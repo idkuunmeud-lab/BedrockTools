@@ -53,10 +53,12 @@ void HitTimingModule::onEnable() {
 }
 
 void HitTimingModule::onDisable() {
-    std::lock_guard lock(m_mutex);
-    m_hasAttack = false;
-    m_combo = 0;
-    m_lastAcceptedAttack = {};
+    {
+        std::lock_guard lock(m_mutex);
+        m_hasAttack = false;
+        m_combo = 0;
+        m_lastAcceptedAttack = {};
+    }
     submitDrawCommands(moduleId, {});
 }
 
@@ -67,6 +69,8 @@ void HitTimingModule::onFrame() {
     int combo = 0;
     bool hasAttack = false;
     bool showStreak = true;
+    float drawX = 20.0f;
+    float drawY = 80.0f;
     float progress = 1.0f;
     std::string status = "READY";
     {
@@ -75,6 +79,8 @@ void HitTimingModule::onFrame() {
         combo = m_combo;
         hasAttack = m_hasAttack;
         showStreak = m_showStreak;
+        drawX = hudPosX;
+        drawY = hudPosY;
         if (hasAttack) {
             const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - m_lastAcceptedAttack).count();
@@ -101,8 +107,8 @@ void HitTimingModule::onFrame() {
 
     PLModMenu_DrawCommand background{};
     background.type = PL_DRAW_RECT_FILLED;
-    background.x = hudPosX;
-    background.y = hudPosY;
+    background.x = drawX;
+    background.y = drawY;
     background.w = width;
     background.h = height;
     background.color = 0xB0000000;
@@ -110,8 +116,8 @@ void HitTimingModule::onFrame() {
 
     PLModMenu_DrawCommand barBackground{};
     barBackground.type = PL_DRAW_RECT_FILLED;
-    barBackground.x = hudPosX + 8.0f;
-    barBackground.y = hudPosY + height - barHeight - 6.0f;
+    barBackground.x = drawX + 8.0f;
+    barBackground.y = drawY + height - barHeight - 6.0f;
     barBackground.w = width - 16.0f;
     barBackground.h = barHeight;
     barBackground.color = 0xFF343434;
@@ -119,8 +125,8 @@ void HitTimingModule::onFrame() {
 
     PLModMenu_DrawCommand bar{};
     bar.type = PL_DRAW_RECT_FILLED;
-    bar.x = hudPosX + 8.0f;
-    bar.y = hudPosY + height - barHeight - 6.0f;
+    bar.x = drawX + 8.0f;
+    bar.y = drawY + height - barHeight - 6.0f;
     bar.w = (width - 16.0f) * progress;
     bar.h = barHeight;
     bar.color = status == "READY" ? 0xFF49D17D : 0xFFE0A43A;
@@ -131,8 +137,8 @@ void HitTimingModule::onFrame() {
         : status;
     PLModMenu_DrawCommand text{};
     text.type = PL_DRAW_TEXT;
-    text.x = hudPosX + 8.0f;
-    text.y = hudPosY + 4.0f;
+    text.x = drawX + 8.0f;
+    text.y = drawY + 4.0f;
     text.w = width - 16.0f;
     text.h = height - barHeight - 8.0f;
     text.size = 22.0f;
