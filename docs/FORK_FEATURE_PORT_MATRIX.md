@@ -76,3 +76,13 @@ Implemented as an opt-in world-space line preview for held ender pearls, snowbal
 ## Breadcrumbs removal
 
 Breadcrumbs has been removed entirely: its implementation and header are deleted, and its include and module registration are removed from ModuleRegistry. Projectile Trajectory Preview remains the replacement feature slot in Gold Aether PvP; runtime accuracy still requires in-world validation of launch constants and collision behavior.
+
+
+## Additional AetherPvP hub integrations — 2026-11-26
+
+The Gold Aether PvP hub now also exposes three existing BedrockTools modules instead of duplicating them:
+- Hitbox — existing entity hitbox renderer. It uses RenderLevel/tessellator hooks plus nearby-actor and visibility signatures; exact-build runtime validation is still required.
+- View Model — existing first-person item transform controls. It depends on multiple item-in-hand renderer and matrix-transform signatures; treat as version-sensitive.
+- Swing Modifier — existing visual swing timing/transform module. It depends on first-person render and swing-duration signatures; it is a visual-only effect.
+
+These are existing registered implementations surfaced through the AetherPvP hub, not newly ported upstream code. Keep them opt-in and validate independently on the target Bedrock binary.
