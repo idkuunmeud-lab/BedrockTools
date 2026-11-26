@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 
+#include <array>
 #include <chrono>
 #include <string>
 
@@ -24,6 +25,9 @@ private:
     unsigned int m_windowFrames = 0;
     int m_currentFps = 0;
     float m_frameTimeMs = 0.0f;
+    std::array<float, 48> m_frameTimes{};
+    std::size_t m_frameSampleIndex = 0;
+    std::size_t m_frameSampleCount = 0;
     std::string m_displayText = "FPS: --";
 
     float hudPosX = 20.0f;
@@ -33,4 +37,6 @@ private:
     bool m_showFrameTime = true;
     bool m_background = false;
     float m_backgroundOpacity = 0.5f;
+    bool m_showGraph = true;
+    float m_graphHeight = 22.0f;
 };
