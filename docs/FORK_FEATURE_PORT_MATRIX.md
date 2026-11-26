@@ -45,7 +45,6 @@ The hub links existing BedrockTools modules; it does not duplicate implementatio
 | Chat Timestamps | bedrocktools.Chat Timestamps | Utility |
 | Zoom | bedrocktools.Zoom | Camera |
 | Freelook | bedrocktools.Freelook | Camera |
-| Breadcrumbs | bedrocktools.Breadcrumbs | Visual |
 | Chunk Border | bedrocktools.Chunk Border | Visual |
 | Low Graphics Profile | bedrocktools.Low Graphics Profile | Performance |
 | Projectile Trajectory Preview | bedrocktools.Projectile Trajectory Preview | PvP HUD (planned; disabled until shared world-render integration is implemented) |
@@ -72,3 +71,8 @@ No external implementation code is copied in this batch. The forks remain separa
 ## Projectile trajectory preview status
 
 The Gold Aether PvP menu now reserves a dedicated, disabled entry for Projectile Trajectory Preview. It is intentionally unavailable until a shared world-render hook is implemented. The current Breadcrumbs and Chunk Border modules independently hook RenderLevel; installing a third independent hook at the same target risks hook chaining conflicts and instability. The preview must use one coordinated render path, verified projectile launch parameters and collision handling before it can be enabled. The placeholder does not install hooks, read projectile state, or affect frame performance.
+
+
+## Breadcrumbs removal
+
+Breadcrumbs has been removed from the Gold Aether PvP feature hub at the user's request. The standalone BedrockTools Breadcrumbs module source and registry registration are retained unchanged; this removes it from the Gold hub without deleting the independent module or changing existing user configurations.
