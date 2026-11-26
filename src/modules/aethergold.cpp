@@ -30,7 +30,7 @@ constexpr std::array<AetherFeature,24> kFeatures{{
 {"freelook","Freelook","Look around without changing your player's facing or movement direction.","bedrocktools.Freelook","camera"},
 {"chunk_border","Chunk Border","Draw chunk boundaries for world orientation.","bedrocktools.Chunk Border","visual"},
 {"low_graphics","Low Graphics Profile","Temporarily disable selected visual effects to reduce rendering load.","bedrocktools.Low Graphics Profile","performance"},
-{"projectile_trajectory","Projectile Trajectory Preview","Experimental trajectory preview for supported throwable projectiles. Awaiting shared world-render integration; unavailable in this build.","bedrocktools.Projectile Trajectory Preview","pvp_hud"}
+{"projectile_trajectory","Projectile Trajectory Preview","Draw the estimated flight path while holding an ender pearl, snowball, egg or trident.","bedrocktools.Projectile Trajectory Preview","pvp_hud"}
 }};
 const AetherFeature* findFeature(std::string_view key) { for (const auto& f:kFeatures) if(f.key==key) return &f; return nullptr; }
 }
