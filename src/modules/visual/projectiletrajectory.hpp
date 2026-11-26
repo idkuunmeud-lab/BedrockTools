@@ -4,6 +4,7 @@
 #include <bedrocktools/sdk/Types.hpp>
 #include <cstdint>
 #include <vector>
+#include <cstdint>
 
 namespace bedrocktools::sdk { class Player; }
 
@@ -28,4 +29,5 @@ private:
     void* m_renderMesh = nullptr;
     void* m_hookHandle = nullptr;
     bool m_hookInstalled = false;
+    std::uint64_t m_subscription = 0;
 };
