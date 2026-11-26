@@ -33,7 +33,7 @@ constexpr std::array<AetherFeature,27> kFeatures{{
 {"swing_modifier","Swing Modifier","Customize the visual first-person swing animation.","bedrocktools.Swing Modifier","visual"},
 {"chunk_border","Chunk Border","Draw chunk boundaries for world orientation.","bedrocktools.Chunk Border","visual"},
 {"low_graphics","Low Graphics Profile","Temporarily disable selected visual effects to reduce rendering load.","bedrocktools.Low Graphics Profile","performance"},
-{"projectile_trajectory","Projectile Trajectory Preview","Draw estimated flight paths for ender pearls, snowballs, eggs, tridents and fully charged bows; mark predicted solid-block impacts. Bow charge and block collisions are not yet measured.","bedrocktools.Projectile Trajectory Preview","pvp_hud"}
+{"projectile_trajectory","Projectile Trajectory Preview","Draw estimated flight paths for ender pearls, snowballs, eggs, tridents and fully charged bows and crossbows; mark predicted solid-block impacts. Bow charge and block collisions are not yet measured.","bedrocktools.Projectile Trajectory Preview","pvp_hud"}
 }};
 const AetherFeature* findFeature(std::string_view key) { for (const auto& f:kFeatures) if(f.key==key) return &f; return nullptr; }
 }
