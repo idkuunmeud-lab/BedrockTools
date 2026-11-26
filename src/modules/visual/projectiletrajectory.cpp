@@ -56,7 +56,7 @@ bool heldItemIdentifier(const sdk::Player* player, std::string& result) {
     if (!player) return false;
 
     auto table = *reinterpret_cast<void***>(const_cast<sdk::Player*>(player));
-    if (!table || !table[sdk::offsets::VTable::PlayerGetCarriedItem]) return false;
+    if (!table || !table[bedrocktools::sdk::offsets::VTable::PlayerGetCarriedItem]) return false;
 
     using GetCarriedItem = const void*(*)(const void*);
     const void* stack = reinterpret_cast<GetCarriedItem>(
@@ -166,13 +166,13 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     const float dy = -std::sin(pitch);
     const float dz = std::cos(yaw) * cosPitch;
 
-    std::array<sdk::Vec3, kMaxFlightTicks + 1> points{};
-    sdk::Vec3 point{
+    std::array<bedrocktools::sdk::Vec3, kMaxFlightTicks + 1> points{};
+    bedrocktools::sdk::Vec3 point{
         position.x + dx * 0.25f,
         position.y + 1.52f + dy * 0.25f,
         position.z + dz * 0.25f
     };
-    sdk::Vec3 velocity{dx * physics.speed, dy * physics.speed, dz * physics.speed};
+    bedrocktools::sdk::Vec3 velocity{dx * physics.speed, dy * physics.speed, dz * physics.speed};
     points[0] = point;
     int count = 1;
 
@@ -199,7 +199,7 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     if (!lrp || reinterpret_cast<std::uintptr_t>(lrp) < 0x10000) return;
 
     const auto lrpAddress = reinterpret_cast<std::uintptr_t>(lrp);
-    const auto camera = *reinterpret_cast<const sdk::Vec3*>(
+    const auto camera = *reinterpret_cast<const bedrocktools::sdk::Vec3*>(
         lrpAddress + sdk::offsets::LevelRendererPlayer::mCamPos);
     if (!std::isfinite(camera.x) || !std::isfinite(camera.y) || !std::isfinite(camera.z)) return;
 
@@ -210,7 +210,7 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
 
     void* material = reinterpret_cast<void*>(
         lrpAddress + sdk::offsets::LevelRendererPlayer::mSelectionOverlayMaterial);
-    core::ScopedShaderColor shaderColor(screenContext);
+    bedrocktools::core::ScopedShaderColor shaderColor(screenContext);
     if (!shaderColor) return;
 
     auto begin = reinterpret_cast<TessBegin>(m_tessBegin);
