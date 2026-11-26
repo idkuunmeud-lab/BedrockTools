@@ -86,3 +86,8 @@ The Gold Aether PvP hub now also exposes three existing BedrockTools modules ins
 - Swing Modifier — existing visual swing timing/transform module. It depends on first-person render and swing-duration signatures; it is a visual-only effect.
 
 These are existing registered implementations surfaced through the AetherPvP hub, not newly ported upstream code. Keep them opt-in and validate independently on the target Bedrock binary.
+
+
+## Hit Timing — CaramelClient design reference, native BedrockTools implementation
+
+Added a local attack-timing HUD inspired by the documented Select Hit concept in the Apache-2.0 CaramelClient fork. The C++ implementation is independent and uses BedrockTools' AttackEvent/EventBus and HUD draw-command API. It estimates a configurable 100–2000 ms interval from the player's own attack events, ignores repeated inputs inside that interval, and displays a READY/WAIT bar plus an optional local streak. It does not know whether the server registered a hit and must not be presented as server-confirmed combo data. No CaramelClient source code or launcher overlay code was copied.
