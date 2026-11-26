@@ -1,5 +1,6 @@
 #include "ModuleRegistry.hpp"
 #include "visual/fullbright.hpp"
+#include "visual/performanceprofile.hpp"
 #include "visual/motionblur.hpp"
 #include "visual/fpsunlocker.hpp"
 #include "visual/fogcolor.hpp"
@@ -96,6 +97,7 @@ void registerAllModules() {
     auto& registry = ModuleRegistry::get();
     if (!registry.modules().empty()) return;
     registry.emplace<FullbrightModule>();
+    registry.emplace<PerformanceProfileModule>();
     registry.emplace<MotionBlurModule>();
     registry.emplace<FogColorModule>();
     registry.emplace<GlintColorModule>();
