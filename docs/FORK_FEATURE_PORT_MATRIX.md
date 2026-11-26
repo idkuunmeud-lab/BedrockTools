@@ -52,7 +52,7 @@ The hub links existing BedrockTools modules; it does not duplicate implementatio
 ## Compatibility notes
 - Zoom uses BedrockTools' own resolved FOV/turn-delta signatures. Xelo's implementation is not copied.
 - Freelook resolves and installs its own camera hooks and checks required handles before reporting itself available.
-- Breadcrumbs and Chunk Border share the RenderLevel/tessellator path and are version-sensitive. They are independent opt-in modules.
+- Chunk Border uses a version-sensitive RenderLevel/tessellator path and remains an independent opt-in module.
 - Chat Heads is not bundled into this batch: it hooks several UI/player-list paths and performs player/message cache work. It needs a separate performance and signature audit first.
 - Baritone-bedrock is not integrated as autonomous movement/mining. Its assumptions do not map to the current HUD-first task.
 
@@ -70,9 +70,9 @@ No external implementation code is copied in this batch. The forks remain separa
 
 ## Projectile trajectory preview status
 
-The Gold Aether PvP menu now reserves a dedicated, disabled entry for Projectile Trajectory Preview. It is intentionally unavailable until a shared world-render hook is implemented. The current Breadcrumbs and Chunk Border modules independently hook RenderLevel; installing a third independent hook at the same target risks hook chaining conflicts and instability. The preview must use one coordinated render path, verified projectile launch parameters and collision handling before it can be enabled. The placeholder does not install hooks, read projectile state, or affect frame performance.
+The Gold Aether PvP menu now reserves a dedicated, disabled entry for Projectile Trajectory Preview. It is intentionally unavailable until a shared world-render hook is implemented. Chunk Border currently hooks RenderLevel; installing another independent hook at the same target risks hook chaining conflicts and instability. The preview must use one coordinated render path, verified projectile launch parameters and collision handling before it can be enabled. The placeholder does not install hooks, read projectile state, or affect frame performance.
 
 
 ## Breadcrumbs removal
 
-Breadcrumbs has been removed from the Gold Aether PvP feature hub at the user's request. The standalone BedrockTools Breadcrumbs module source and registry registration are retained unchanged; this removes it from the Gold hub without deleting the independent module or changing existing user configurations.
+Breadcrumbs has been removed entirely: its implementation and header are deleted, and its include and module registration are removed from ModuleRegistry. Projectile Trajectory Preview remains the replacement feature slot in Gold Aether PvP; its runtime implementation still requires a coordinated world-render path and verified projectile physics/collision data.
