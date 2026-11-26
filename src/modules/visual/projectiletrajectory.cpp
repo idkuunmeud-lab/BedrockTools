@@ -307,6 +307,7 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
         vertex(tess, b.x - camera.x, b.y - camera.y, b.z - camera.z);
     }
     if (hitSolidBlock) {
+        color(tess, 1.0f, 0.48f, 0.16f, 1.0f);
         const auto& impact = points[static_cast<std::size_t>(count - 1)];
         constexpr float markerSize = 0.16f;
         vertex(tess, impact.x - markerSize - camera.x, impact.y - camera.y, impact.z - camera.z);
