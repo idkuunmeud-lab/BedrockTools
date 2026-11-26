@@ -48,6 +48,7 @@ The hub links existing BedrockTools modules; it does not duplicate implementatio
 | Breadcrumbs | bedrocktools.Breadcrumbs | Visual |
 | Chunk Border | bedrocktools.Chunk Border | Visual |
 | Low Graphics Profile | bedrocktools.Low Graphics Profile | Performance |
+| Projectile Trajectory Preview | bedrocktools.Projectile Trajectory Preview | PvP HUD (planned; disabled until shared world-render integration is implemented) |
 
 ## Compatibility notes
 - Zoom uses BedrockTools' own resolved FOV/turn-delta signatures. Xelo's implementation is not copied.
@@ -66,3 +67,8 @@ The hub links existing BedrockTools modules; it does not duplicate implementatio
 
 ## Licensing and attribution
 No external implementation code is copied in this batch. The forks remain separate repositories. Any future source reuse must record the exact upstream file, license, required notices/source-offer obligations, and compatibility impact before code is brought across.
+
+
+## Projectile trajectory preview status
+
+The Gold Aether PvP menu now reserves a dedicated, disabled entry for Projectile Trajectory Preview. It is intentionally unavailable until a shared world-render hook is implemented. The current Breadcrumbs and Chunk Border modules independently hook RenderLevel; installing a third independent hook at the same target risks hook chaining conflicts and instability. The preview must use one coordinated render path, verified projectile launch parameters and collision handling before it can be enabled. The placeholder does not install hooks, read projectile state, or affect frame performance.
