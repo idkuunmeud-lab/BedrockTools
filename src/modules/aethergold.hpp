@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "Module.hpp"
 
 class AetherGoldModule : public Module {
 public:
