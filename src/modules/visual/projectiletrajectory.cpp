@@ -33,6 +33,8 @@ bool physicsFor(const std::string& id, ProjectilePhysics& out) {
     if (id.find("snowball") != std::string::npos) { out = {1.5f, 0.03f, 0.99f}; return true; }
     if (id.find("egg") != std::string::npos) { out = {1.5f, 0.03f, 0.99f}; return true; }
     if (id.find("trident") != std::string::npos) { out = {2.5f, 0.05f, 0.99f}; return true; }
+    // Bow prediction assumes a fully drawn shot; actual draw strength is not exposed by this SDK yet.
+    if (id.find("minecraft:bow") != std::string::npos) { out = {3.0f, 0.05f, 0.99f}; return true; }
     return false;
 }
 
@@ -62,7 +64,7 @@ void projectileTrajectoryRenderHook(void* renderer, void* screenContext, void* e
 
 ProjectileTrajectoryPreviewModule::ProjectileTrajectoryPreviewModule()
     : Module("Projectile Trajectory Preview",
-             "Predict the flight path of held ender pearls, snowballs, eggs and tridents.") {
+             "Predict flight paths for held throwables, tridents and fully drawn bows (bow charge is estimated).") {
     hideInHudEditor = true;
     g_trajectory = this;
 }
