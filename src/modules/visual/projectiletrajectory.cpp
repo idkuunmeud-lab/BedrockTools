@@ -45,8 +45,12 @@ bool physicsFor(const std::string& id, ProjectilePhysics& out) {
         out = {2.50f, 0.05f, 0.99f};
         return true;
     }
-    // The current SDK does not expose active bow-use charge; this is the full-charge estimate.
-    if (id.find("bow") != std::string::npos && id.find("crossbow") == std::string::npos) {
+    // The current SDK does not expose active bow-use charge; use a full-charge estimate.
+    if (id.find("crossbow") != std::string::npos) {
+        out = {3.15f, 0.05f, 0.99f};
+        return true;
+    }
+    if (id.find("bow") != std::string::npos) {
         out = {3.00f, 0.05f, 0.99f};
         return true;
     }
@@ -194,7 +198,8 @@ void ProjectileTrajectoryPreviewModule::updatePlayer(bedrocktools::sdk::Player* 
     nextCount = 1;
 
     void* blockSource = nullptr;
-    if (auto* dimension = player->dimension()) {
+    if (auto* dimension = player->dimension();
+        dimension && reinterpret_cast<std::uintptr_t>(dimension) >= 0x10000) {
         blockSource = bedrocktools::sdk::field<void*>(
             dimension, bedrocktools::sdk::offsets::Dimension::mBlockSource);
         if (reinterpret_cast<std::uintptr_t>(blockSource) < 0x10000) blockSource = nullptr;
