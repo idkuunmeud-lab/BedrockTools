@@ -18,6 +18,7 @@ using TessBegin = void(*)(void*, void*, int, int, int);
 using TessColor = void(*)(void*, float, float, float, float);
 using TessVertex = void(*)(void*, float, float, float);
 using RenderMesh = void(*)(void*, void*, void*, char*);
+using IsSolidBlockingBlock = bool(*)(void*, const bedrocktools::sdk::BlockPos&);
 
 constexpr float kDegreesToRadians = 0.01745329251994329577f;
 constexpr int kMaxFlightTicks = 100;
@@ -116,6 +117,8 @@ void ProjectileTrajectoryPreviewModule::onInit() {
         bedrocktools::memory::resolve(bedrocktools::memory::SignatureId::TessellatorVertex));
     m_renderMesh = reinterpret_cast<void*>(
         bedrocktools::memory::resolve(bedrocktools::memory::SignatureId::MeshHelpersRenderMeshImmediately2));
+    m_isSolidBlockingBlock = reinterpret_cast<void*>(
+        bedrocktools::memory::resolve(bedrocktools::memory::SignatureId::BlockSourceIsSolidBlockingBlock));
 
     m_subscription = bedrocktools::events::bus().subscribe<bedrocktools::events::LocalPlayerTickEvent>(
         [this](auto& event) { updatePlayer(event.player); });
@@ -175,6 +178,14 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     bedrocktools::sdk::Vec3 velocity{dx * physics.speed, dy * physics.speed, dz * physics.speed};
     points[0] = point;
     int count = 1;
+    bool hitSolidBlock = false;
+    void* blockSource = nullptr;
+    if (auto* dimension = player->dimension()) {
+        blockSource = bedrocktools::sdk::field<void*>(
+            dimension, bedrocktools::sdk::offsets::Dimension::mBlockSource);
+        if (reinterpret_cast<std::uintptr_t>(blockSource) < 0x10000) blockSource = nullptr;
+    }
+    auto isSolidBlockingBlock = reinterpret_cast<IsSolidBlockingBlock>(m_isSolidBlockingBlock);
 
     for (int tick = 0; tick < kMaxFlightTicks; ++tick) {
         point.x += velocity.x;
@@ -189,6 +200,17 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
             !std::isfinite(point.z)) break;
 
         points[count++] = point;
+        if (blockSource && isSolidBlockingBlock) {
+            const bedrocktools::sdk::BlockPos blockPos{
+                static_cast<int>(std::floor(point.x)),
+                static_cast<int>(std::floor(point.y)),
+                static_cast<int>(std::floor(point.z))
+            };
+            if (isSolidBlockingBlock(blockSource, blockPos)) {
+                hitSolidBlock = true;
+                break;
+            }
+        }
         if (point.y < -64.0f || point.y > 512.0f) break;
     }
     if (count < 2) return;
@@ -218,13 +240,24 @@ void ProjectileTrajectoryPreviewModule::render(void* renderer, void* screenConte
     auto vertex = reinterpret_cast<TessVertex>(m_tessVertex);
     auto draw = reinterpret_cast<RenderMesh>(m_renderMesh);
 
-    begin(tess, nullptr, 4, (count - 1) * 2, 0);
+    const int markerVertices = hitSolidBlock ? 6 : 0;
+    begin(tess, nullptr, 4, (count - 1) * 2 + markerVertices, 0);
     color(tess, 0.12f, 0.92f, 1.0f, 0.95f);
     for (int i = 1; i < count; ++i) {
         const auto& a = points[static_cast<std::size_t>(i - 1)];
         const auto& b = points[static_cast<std::size_t>(i)];
         vertex(tess, a.x - camera.x, a.y - camera.y, a.z - camera.z);
         vertex(tess, b.x - camera.x, b.y - camera.y, b.z - camera.z);
+    }
+    if (hitSolidBlock) {
+        const auto& impact = points[static_cast<std::size_t>(count - 1)];
+        constexpr float markerSize = 0.16f;
+        vertex(tess, impact.x - markerSize - camera.x, impact.y - camera.y, impact.z - camera.z);
+        vertex(tess, impact.x + markerSize - camera.x, impact.y - camera.y, impact.z - camera.z);
+        vertex(tess, impact.x - camera.x, impact.y - markerSize - camera.y, impact.z - camera.z);
+        vertex(tess, impact.x - camera.x, impact.y + markerSize - camera.y, impact.z - camera.z);
+        vertex(tess, impact.x - camera.x, impact.y - camera.y, impact.z - markerSize - camera.z);
+        vertex(tess, impact.x - camera.x, impact.y - camera.y, impact.z + markerSize - camera.z);
     }
 
     char pad[0x58]{};
