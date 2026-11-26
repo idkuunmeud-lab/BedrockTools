@@ -1,4 +1,5 @@
 #include "fpsdisplay.hpp"
+#include <pl/ModMenu.hpp>
 
 #include <algorithm>
 #include <cmath>
