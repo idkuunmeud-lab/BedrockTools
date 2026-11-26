@@ -8,6 +8,8 @@
 #include "visual/nofog.hpp"
 #include "hud/pingcounter.hpp"
 #include "hud/fpsdisplay.hpp"
+#include "hud/inventorysupply.hpp"
+#include "hud/sessiontimer.hpp"
 #include "hud/worldtime.hpp"
 #include "hud/totemcounter.hpp"
 #include "hud/arrowcounter.hpp"
@@ -101,6 +103,8 @@ void registerAllModules() {
     registry.emplace<NoFogModule>();
     registry.emplace<PingCounterModule>();
     registry.emplace<FpsDisplayModule>();
+    registry.emplace<InventorySupplyModule>();
+    registry.emplace<SessionTimerModule>();
     registry.emplace<ReachCounterModule>();
     registry.emplace<ComboDisplay>();
     registry.emplace<BreakIndicatorModule>();
